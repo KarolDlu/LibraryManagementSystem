@@ -1,5 +1,6 @@
 package com.library.librarysystem.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,9 +23,11 @@ public class Author {
     @NotBlank
     private String name;
 
+    @Lob
     @NotBlank
     private String description;
 
+    @JsonIgnore
     @ManyToMany(fetch = FetchType.LAZY,
             cascade = {
                     CascadeType.PERSIST,

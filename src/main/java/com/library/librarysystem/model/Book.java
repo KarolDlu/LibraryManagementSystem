@@ -1,5 +1,7 @@
 package com.library.librarysystem.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,15 +32,12 @@ public class Book {
     @Enumerated(EnumType.STRING)
     private Genre genre;
 
+    @Lob
     @NotBlank
     private String description;
 
     @NotNull
-    @ManyToMany(fetch = FetchType.LAZY,
-            cascade = {
-                    CascadeType.PERSIST,
-                    CascadeType.MERGE
-            })
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "book_authors",
             joinColumns = {@JoinColumn(name = "book_id")},
             inverseJoinColumns = {@JoinColumn(name = "authors_id")})
@@ -48,9 +47,14 @@ public class Book {
     private String publisher;
 
     @NotNull
+    @JsonFormat(pattern = "yyyy-mm-dd")
     private Date dateOfPublication;
 
     @NotNull
     private Integer numberOfPages;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "book",cascade = CascadeType.REMOVE)
+    private List<BookItem> bookItem = new ArrayList<>();
 
 }
