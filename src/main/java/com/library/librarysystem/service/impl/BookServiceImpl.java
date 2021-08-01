@@ -30,7 +30,7 @@ public class BookServiceImpl implements BookService {
         if (!bookRepo.findByIsbn(newBook.getIsbn()).isPresent()) {
             return bookRepo.save(newBook);
         }
-        return null;
+        return null; // add throw statement
     }
 
     @Override
@@ -49,7 +49,7 @@ public class BookServiceImpl implements BookService {
         if (author.isPresent()){
             return bookRepo.findBookByAuthorsContains(author.get());
         }
-        return null;
+        return null; // add throw statement
     }
 
     @Override
@@ -63,7 +63,7 @@ public class BookServiceImpl implements BookService {
         if (book.isPresent()){
             return book.get();
         }
-        return null;
+        return null; // add throw statement
     }
 
     @Override
@@ -72,7 +72,7 @@ public class BookServiceImpl implements BookService {
         if (book.isPresent()){
             return book.get();
         }
-        return null;
+        return null; // add throw statement
     }
 
     @Override

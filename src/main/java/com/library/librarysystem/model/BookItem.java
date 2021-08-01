@@ -1,11 +1,13 @@
 package com.library.librarysystem.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Entity
@@ -27,6 +29,16 @@ public class BookItem {
     private BookStatus bookStatus;
 
     @NotNull
+    @JsonFormat(pattern = "yyyy-mm-dd")
     private Date dateOfPurchase;
 
+    @NotNull
+    private Double price;
+
+    public BookItem(@NotNull Book book, BookStatus bookStatus, @NotNull Date dateOfPurchase, @NotNull Double price) {
+        this.book = book;
+        this.bookStatus = bookStatus;
+        this.dateOfPurchase = dateOfPurchase;
+        this.price = price;
+    }
 }
