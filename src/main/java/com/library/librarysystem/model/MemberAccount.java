@@ -1,6 +1,7 @@
 package com.library.librarysystem.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -21,10 +22,10 @@ public class MemberAccount {
     @Enumerated(EnumType.STRING)
     private AccountStatus accountStatus;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE)
     private Person person;
 
-    @JsonFormat(pattern = "yyyy-mm-dd")
+    @JsonFormat(pattern = "YYYY-MM-DD")
     private Date dateOfCreation;
 
     public MemberAccount(AccountStatus accountStatus, Person person, Date dateOfCreation) {
@@ -47,5 +48,15 @@ public class MemberAccount {
 
     public void changeEmail(String email){
         this.person.setEmail(email);
+    }
+
+    @JsonIgnore
+    public boolean isBlocked(){
+        return this.accountStatus.equals(AccountStatus.BLOCKED);
+    }
+
+    @JsonIgnore
+    public boolean isBlacklisted(){
+        return this.accountStatus.equals(AccountStatus.BLACKLISTED);
     }
 }

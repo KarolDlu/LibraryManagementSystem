@@ -7,8 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor
@@ -28,17 +27,24 @@ public class BookItem {
     @Enumerated(EnumType.STRING)
     private BookStatus bookStatus;
 
-    @NotNull
-    @JsonFormat(pattern = "yyyy-mm-dd")
-    private Date dateOfPurchase;
+    @JsonFormat(pattern = "YYYY-MM-DD")
+    private LocalDate dateOfPurchase;
 
     @NotNull
     private Double price;
 
-    public BookItem(@NotNull Book book, BookStatus bookStatus, @NotNull Date dateOfPurchase, @NotNull Double price) {
+    public BookItem(@NotNull Book book, BookStatus bookStatus, LocalDate dateOfPurchase, @NotNull Double price) {
         this.book = book;
         this.bookStatus = bookStatus;
         this.dateOfPurchase = dateOfPurchase;
         this.price = price;
+    }
+
+    public void borrow(){
+        this.bookStatus = BookStatus.LOANED;
+    }
+
+    public void returnBook(){
+        this.bookStatus = BookStatus.AVAILABLE;
     }
 }

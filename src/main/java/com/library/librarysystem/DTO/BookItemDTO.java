@@ -4,15 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.library.librarysystem.model.Book;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
+import java.time.LocalDate;
 
 public class BookItemDTO {
 
     @NotNull
     private Book book;
-    @NotNull
     @JsonFormat(pattern = "yyyy-mm-dd")
-    private Date dateOfPurchase;
+    private LocalDate dateOfPurchase;
     @NotNull
     private Double price;
 
@@ -24,11 +23,11 @@ public class BookItemDTO {
         this.book = book;
     }
 
-    public Date getDateOfPurchase() {
+    public LocalDate getDateOfPurchase() {
         return dateOfPurchase;
     }
 
-    public void setDateOfPurchase(Date dateOfPurchase) {
+    public void setDateOfPurchase(LocalDate dateOfPurchase) {
         this.dateOfPurchase = dateOfPurchase;
     }
 
