@@ -39,4 +39,12 @@ public class BookLending {
         this.creationDate = creationDate;
         this.dueDate = dueDate;
     }
+
+    public void renewLending(){
+        this.dueDate.plusDays(7);
+    }
+
+    public Book getBook(){
+        return this.getBookItem().getBook();
+    }
 }

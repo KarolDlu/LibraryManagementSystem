@@ -21,7 +21,7 @@ public class BookItem {
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name="book_id")
+    @JoinColumn(name = "book_id")
     private Book book;
 
     @Enumerated(EnumType.STRING)
@@ -40,11 +40,19 @@ public class BookItem {
         this.price = price;
     }
 
-    public void borrow(){
+    public void borrow() {
         this.bookStatus = BookStatus.LOANED;
     }
 
-    public void returnBook(){
+    public void returnBook() {
+        this.bookStatus = BookStatus.AVAILABLE;
+    }
+
+    public void reserve() {
+        this.bookStatus = BookStatus.RESERVED;
+    }
+
+    public void cancelReservation(){
         this.bookStatus = BookStatus.AVAILABLE;
     }
 }
