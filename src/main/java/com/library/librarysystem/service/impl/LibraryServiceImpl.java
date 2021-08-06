@@ -62,7 +62,7 @@ public class LibraryServiceImpl implements LibraryService {
             BookItem bookItem = bookItemRepo.getById(bookItemId);
 
             bookItem.returnBook();
-            Optional<BookReservation> optReservation = bookReservationRepo.findBookReservationsByBookAndReservationStatus_WaitingAndOrderByReservationDateAsc(bookLending.getBook());
+            Optional<BookReservation> optReservation = bookReservationRepo.findBookReservationsByBookAndReservationStatusOrderByReservationDateAsc(bookLending.getBook(), ReservationStatus.WAITING);
             if (optReservation.isPresent()) {
                 BookReservation reservation = optReservation.get();
                 bookItem.reserve();
@@ -82,7 +82,7 @@ public class LibraryServiceImpl implements LibraryService {
         Optional<BookLending> optBookLending = bookLendingRepo.findBookLendingByMemberAccount_IdAndBookItem_Id(memberId, bookItemId);
         if (optBookLending.isPresent()) {
             BookLending bookLending = optBookLending.get();
-            Optional<BookReservation> optReservation = bookReservationRepo.findBookReservationsByBookAndReservationStatus_WaitingAndOrderByReservationDateAsc(bookLending.getBook());
+            Optional<BookReservation> optReservation = bookReservationRepo.findBookReservationsByBookAndReservationStatusOrderByReservationDateAsc(bookLending.getBook(), ReservationStatus.WAITING);
             if (!optReservation.isPresent()) {
                 bookLending.renewLending();
                 bookLendingRepo.save(bookLending);
@@ -112,11 +112,11 @@ public class LibraryServiceImpl implements LibraryService {
 
     private BookItem checkIfBookItemIsAvailable(Long bookItemId) {
         Optional<BookItem> optBookItem = bookItemRepo.findById(bookItemId);
-        if (optBookItem.isEmpty()) {
+        if (!optBookItem.isPresent()) {
             return null; // change to throw statement
         }
         BookItem bookItem = optBookItem.get();
-        if (!bookItem.getBookStatus().equals(BookStatus.AVAILABLE) || !bookItem.getBookStatus().equals(BookStatus.RESERVED)) {
+        if (!bookItem.getBookStatus().equals(BookStatus.AVAILABLE) && !bookItem.getBookStatus().equals(BookStatus.RESERVED)) {
             return null; // change to throw statement
         }
         return bookItem;

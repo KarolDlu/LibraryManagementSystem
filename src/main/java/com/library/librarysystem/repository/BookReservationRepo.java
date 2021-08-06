@@ -2,6 +2,7 @@ package com.library.librarysystem.repository;
 
 import com.library.librarysystem.model.Book;
 import com.library.librarysystem.model.BookReservation;
+import com.library.librarysystem.model.ReservationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +15,6 @@ public interface BookReservationRepo extends JpaRepository<BookReservation, Long
 
     Optional<BookReservation> findBookReservationByMemberAccount_IdAndBook_BookId(Long memberId, Long bookId);
 
-    Optional<BookReservation> findBookReservationsByBookAndReservationStatus_WaitingAndOrderByReservationDateAsc(Book book);
+    Optional<BookReservation> findBookReservationsByBookAndReservationStatusOrderByReservationDateAsc(Book book, ReservationStatus status);
 
 }

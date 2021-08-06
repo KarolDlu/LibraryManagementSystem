@@ -56,13 +56,13 @@ public class ReservationServiceImpl implements ReservationService {
             if (reservation.getReservationStatus().equals(ReservationStatus.PENDING)) {
                 reservation.changeStatus(ReservationStatus.CANCELED);
                 bookReservationRepo.save(reservation);
-                Optional<BookReservation> optWaitingReservation = bookReservationRepo.findBookReservationsByBookAndReservationStatus_WaitingAndOrderByReservationDateAsc(reservation.getBook());
+                Optional<BookReservation> optWaitingReservation = bookReservationRepo.findBookReservationsByBookAndReservationStatusOrderByReservationDateAsc(reservation.getBook(), ReservationStatus.WAITING);
                 if (optWaitingReservation.isPresent()) {
                     BookReservation waitingReservation = optWaitingReservation.get();
                     waitingReservation.changeStatus(ReservationStatus.PENDING);
                     bookReservationRepo.save(waitingReservation);
                 } else {
-                    Optional<BookItem> bookItem = bookItemRepo.findBookItemByBookAndBookStatus_Reserved(reservation.getBook());
+                    Optional<BookItem> bookItem = bookItemRepo.findBookItemByBookAndBookStatus(reservation.getBook(), BookStatus.RESERVED);
                     if (bookItem.isPresent()) {
                         BookItem reservedBook = bookItem.get();
                         reservedBook.cancelReservation();
