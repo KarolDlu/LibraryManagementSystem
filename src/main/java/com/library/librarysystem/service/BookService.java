@@ -1,5 +1,6 @@
 package com.library.librarysystem.service;
 
+import com.library.librarysystem.model.Author;
 import com.library.librarysystem.model.Book;
 import com.library.librarysystem.model.Genre;
 
@@ -22,5 +23,9 @@ public interface BookService {
     Book getBookByIsbn(String isbn);
 
     void deleteBookById(Long bookId);
+
+    Author addAuthor(Author author);
+
+    void deleteAuthor(Long authorId);
 
 }

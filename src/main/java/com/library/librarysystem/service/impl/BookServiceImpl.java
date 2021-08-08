@@ -1,6 +1,7 @@
 package com.library.librarysystem.service.impl;
 
 import com.library.librarysystem.exceptions.BookAlreadyExists;
+import com.library.librarysystem.exceptions.ObjectAlreadyExistsException;
 import com.library.librarysystem.exceptions.ObjectNotFoundException;
 import com.library.librarysystem.model.Author;
 import com.library.librarysystem.model.Book;
@@ -48,7 +49,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<Book> getBooksByAuthor(Long id) {
         Optional<Author> author = authorRepo.findById(id);
-        if (author.isPresent()){
+        if (author.isPresent()) {
             return bookRepo.findBookByAuthorsContains(author.get());
         }
         throw new ObjectNotFoundException("Author", id);
@@ -62,7 +63,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book getBookById(Long id) {
         Optional<Book> book = bookRepo.findById(id);
-        if (book.isPresent()){
+        if (book.isPresent()) {
             return book.get();
         }
         throw new ObjectNotFoundException("Book", id); // add throw statement
@@ -71,7 +72,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book getBookByIsbn(String isbn) {
         Optional<Book> book = bookRepo.findByIsbn(isbn);
-        if (book.isPresent()){
+        if (book.isPresent()) {
             return book.get();
         }
         throw new ObjectNotFoundException("Book", "isbn", isbn); // add throw statement
@@ -80,5 +81,21 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteBookById(Long bookId) {
         bookRepo.deleteById(bookId);
+    }
+
+    @Override
+    public Author addAuthor(Author author) {
+        if (authorRepo.findAuthorByName(author.getName()).isPresent()) {
+            return authorRepo.save(author);
+        }
+        throw new ObjectAlreadyExistsException("Author with given name: " + author.getName() + " already exists.");
+    }
+
+    @Override
+    public void deleteAuthor(Long authorId) {
+        if (authorRepo.findById(authorId).isPresent()) {
+            authorRepo.deleteById(authorId);
+        }
+        throw new ObjectNotFoundException("Author", authorId);
     }
 }

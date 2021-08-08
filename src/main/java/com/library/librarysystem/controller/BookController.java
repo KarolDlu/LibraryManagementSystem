@@ -1,5 +1,6 @@
 package com.library.librarysystem.controller;
 
+import com.library.librarysystem.model.Author;
 import com.library.librarysystem.model.Book;
 import com.library.librarysystem.model.Genre;
 import com.library.librarysystem.service.BookService;
@@ -58,9 +59,20 @@ public class BookController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteBookById(@PathVariable Long id){
+    public ResponseEntity deleteBookById(@PathVariable Long id) {
         bookService.deleteBookById(id);
         return ResponseEntity.ok("Book has been deleted.");
     }
 
+    @PostMapping("/author/add")
+    public ResponseEntity<Author> addAuthor(@RequestBody Author author) {
+        return new ResponseEntity<>(bookService.addAuthor(author), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/author/delete/{id}")
+    public ResponseEntity<String> deleteAuthor(@PathVariable Long id) {
+        bookService.deleteAuthor(id);
+        return new ResponseEntity<>("Author has been deleted.", HttpStatus.OK);
+    }
 }
+
