@@ -1,6 +1,7 @@
 package com.library.librarysystem.service.impl;
 
 import com.library.librarysystem.config.Constants;
+import com.library.librarysystem.exceptions.*;
 import com.library.librarysystem.model.*;
 import com.library.librarysystem.repository.BookItemRepo;
 import com.library.librarysystem.repository.BookLendingRepo;
@@ -43,7 +44,7 @@ public class LibraryServiceImpl implements LibraryService {
         if (bookLendingRepo.findBookLendingByMemberAccount_Id(memberId).size() < Constants.MAX_BOOKS_BORROWED_BY_USER) {
 
             if (reservationService.checkIfBookIsReservedByMember(memberId, bookItem.getBook().getBookId())) {
-                return reservationService.completeReservation(memberId, bookItem.getBook().getBookId()); // complete book reservation
+                return reservationService.completeReservation(memberId, bookItem.getBook().getBookId());
             }
             bookItem.borrow();
             bookItemRepo.save(bookItem);
@@ -53,7 +54,7 @@ public class LibraryServiceImpl implements LibraryService {
             }
             return bookLendingRepo.save(new BookLending(bookItem, member, LocalDate.now(), LocalDate.now().plusDays(Constants.MAX_LENDING_DAYS)));
         }
-        return null; // change to throw statement
+        throw new MaxNumberOfBorrowedBooksReachedException(memberId, Constants.MAX_BOOKS_BORROWED_BY_USER);
     }
 
     @Override
@@ -95,22 +96,22 @@ public class LibraryServiceImpl implements LibraryService {
             reservedBookItem.reserve();
             bookItemRepo.save(reservedBookItem);
             reservation.changeStatus(ReservationStatus.PENDING);
-            return false; // throw book is reserved
+            throw new BookAlreadyReservedException(reservedBookItem.getBook().getBookId());
         }
-        return false; // throw Lending not found
+        throw new ObjectNotFoundException("BookLending with memberId: (" + memberId + ") and bookItemId: (" + bookItemId + ") does not exists.");
     }
 
     private MemberAccount checkIfMemberMayBorrowBook(Long memberId) {
         if (bookLendingRepo.findBookLendingByMemberAccount_Id(memberId).size() > Constants.MAX_BOOKS_BORROWED_BY_USER) {
-            return null; // member has borrowed the maximum number of books
+            throw new MaxNumberOfBorrowedBooksReachedException(memberId, Constants.MAX_BOOKS_BORROWED_BY_USER);
         }
         Optional<MemberAccount> optMember = memberAccountRepo.findById(memberId);
-        if (optMember.isEmpty()) {
-            return null; // change to throw statement
+        if (!optMember.isPresent()) {
+            throw new ObjectNotFoundException("Member", memberId);
         }
         MemberAccount member = optMember.get();
         if (member.isBlocked()) {
-            return null; // change to throw statement
+            throw new MemberAccountBlockedException(memberId);
         }
         return member;
     }
@@ -118,11 +119,11 @@ public class LibraryServiceImpl implements LibraryService {
     private BookItem checkIfBookItemIsAvailable(Long bookItemId) {
         Optional<BookItem> optBookItem = bookItemRepo.findById(bookItemId);
         if (!optBookItem.isPresent()) {
-            return null; // change to throw statement
+            throw new ObjectNotFoundException("A copy of book", bookItemId);
         }
         BookItem bookItem = optBookItem.get();
         if (!bookItem.getBookStatus().equals(BookStatus.AVAILABLE)) {
-            return null; // change to throw statement
+            throw new BookNotAvailableException(bookItemId);
         }
         return bookItem;
     }

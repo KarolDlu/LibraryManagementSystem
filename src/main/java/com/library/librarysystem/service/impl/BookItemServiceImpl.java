@@ -1,6 +1,7 @@
 package com.library.librarysystem.service.impl;
 
 import com.library.librarysystem.DTO.BookItemDTO;
+import com.library.librarysystem.exceptions.ObjectNotFoundException;
 import com.library.librarysystem.model.Book;
 import com.library.librarysystem.model.BookItem;
 import com.library.librarysystem.model.BookStatus;
@@ -32,7 +33,7 @@ public class BookItemServiceImpl implements BookItemService {
             BookItem bookItem = new BookItem(book.get(), BookStatus.AVAILABLE, newBookItem.getDateOfPurchase(), newBookItem.getPrice());
             return bookItemRepo.save(bookItem);
         }
-        return null; // add throw statement
+        throw new ObjectNotFoundException("Book", newBookItem.getBook().getBookId());
     }
 
     @Override
@@ -51,7 +52,7 @@ public class BookItemServiceImpl implements BookItemService {
         if (bookItem.isPresent()) {
             return bookItem.get();
         }
-        return null; // add throw statement
+        throw new ObjectNotFoundException("BookItem", bookItemId);
     }
 
     @Override
@@ -59,7 +60,7 @@ public class BookItemServiceImpl implements BookItemService {
         if (bookItemRepo.findById(bookItemId).isPresent()) {
             bookItemRepo.deleteById(bookItemId);
         } else {
-            return; // add throw statement
+            throw new ObjectNotFoundException("BookItem", bookItemId);
         }
     }
 }

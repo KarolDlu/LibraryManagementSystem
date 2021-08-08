@@ -1,5 +1,7 @@
 package com.library.librarysystem.service.impl;
 
+import com.library.librarysystem.exceptions.BookAlreadyExists;
+import com.library.librarysystem.exceptions.ObjectNotFoundException;
 import com.library.librarysystem.model.Author;
 import com.library.librarysystem.model.Book;
 import com.library.librarysystem.model.Genre;
@@ -30,7 +32,7 @@ public class BookServiceImpl implements BookService {
         if (!bookRepo.findByIsbn(newBook.getIsbn()).isPresent()) {
             return bookRepo.save(newBook);
         }
-        return null; // add throw statement
+        throw new BookAlreadyExists(newBook.getIsbn());
     }
 
     @Override
@@ -49,7 +51,7 @@ public class BookServiceImpl implements BookService {
         if (author.isPresent()){
             return bookRepo.findBookByAuthorsContains(author.get());
         }
-        return null; // add throw statement
+        throw new ObjectNotFoundException("Author", id);
     }
 
     @Override
@@ -63,7 +65,7 @@ public class BookServiceImpl implements BookService {
         if (book.isPresent()){
             return book.get();
         }
-        return null; // add throw statement
+        throw new ObjectNotFoundException("Book", id); // add throw statement
     }
 
     @Override
@@ -72,7 +74,7 @@ public class BookServiceImpl implements BookService {
         if (book.isPresent()){
             return book.get();
         }
-        return null; // add throw statement
+        throw new ObjectNotFoundException("Book", "isbn", isbn); // add throw statement
     }
 
     @Override

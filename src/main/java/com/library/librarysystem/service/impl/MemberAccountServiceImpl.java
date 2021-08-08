@@ -1,5 +1,7 @@
 package com.library.librarysystem.service.impl;
 
+import com.library.librarysystem.exceptions.ObjectNotFoundException;
+import com.library.librarysystem.exceptions.PersonAlreadyExistsException;
 import com.library.librarysystem.model.AccountStatus;
 import com.library.librarysystem.model.Address;
 import com.library.librarysystem.model.MemberAccount;
@@ -10,7 +12,6 @@ import com.library.librarysystem.service.MemberAccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.sql.Date;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,29 +37,29 @@ public class MemberAccountServiceImpl implements MemberAccountService {
             MemberAccount memberAccount = new MemberAccount(AccountStatus.ACTIVE, newPerson, Date.valueOf(LocalDateTime.now().toLocalDate()));
             return memberAccountRepo.save(memberAccount);
         }
-        return null; // add throw statement person with given email already exist
+        throw new PersonAlreadyExistsException(person.getEmail());
     }
 
     @Override
     public MemberAccount addMemberToBlacklist(Long memberId) {
         Optional<MemberAccount> optMember = memberAccountRepo.findById(memberId);
-        if (optMember.isPresent()){
+        if (optMember.isPresent()) {
             MemberAccount member = optMember.get();
             member.addToBlacklist();
             return memberAccountRepo.save(member);
         }
-        return null; // add throw statement
+        throw new ObjectNotFoundException("Member account", memberId);
     }
 
     @Override
     public MemberAccount blockMemberAccount(Long memberId) {
         Optional<MemberAccount> optMember = memberAccountRepo.findById(memberId);
-        if (optMember.isPresent()){
+        if (optMember.isPresent()) {
             MemberAccount member = optMember.get();
             member.blockAccount();
             return memberAccountRepo.save(member);
         }
-        return null; // add throw statement
+        throw new ObjectNotFoundException("Member account", memberId);
     }
 
     @Override
@@ -69,23 +70,23 @@ public class MemberAccountServiceImpl implements MemberAccountService {
     @Override
     public MemberAccount changeAddress(Long memberId, Address address) {
         Optional<MemberAccount> optMember = memberAccountRepo.findById(memberId);
-        if (optMember.isPresent()){
+        if (optMember.isPresent()) {
             MemberAccount member = optMember.get();
             member.changeAddress(address);
             memberAccountRepo.save(member);
         }
-        return null; // add throw statement
+        throw new ObjectNotFoundException("Member account", memberId);
     }
 
     @Override
     public MemberAccount changeEmail(Long memberId, String email) {
         Optional<MemberAccount> optMember = memberAccountRepo.findById(memberId);
-        if (optMember.isPresent()){
+        if (optMember.isPresent()) {
             MemberAccount member = optMember.get();
             member.changeEmail(email);
             memberAccountRepo.save(member);
         }
-        return null; // add throw statement
+        throw new ObjectNotFoundException("Member account", memberId);
     }
 
     @Override

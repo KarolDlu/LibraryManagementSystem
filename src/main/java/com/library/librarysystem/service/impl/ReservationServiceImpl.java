@@ -1,6 +1,10 @@
 package com.library.librarysystem.service.impl;
 
 import com.library.librarysystem.config.Constants;
+import com.library.librarysystem.exceptions.MaxNumberOfReservationReachedException;
+import com.library.librarysystem.exceptions.ObjectNotFoundException;
+import com.library.librarysystem.exceptions.ReservationAlreadyExistsException;
+import com.library.librarysystem.exceptions.ReservationNotFoundException;
 import com.library.librarysystem.model.*;
 import com.library.librarysystem.repository.BookItemRepo;
 import com.library.librarysystem.repository.BookLendingRepo;
@@ -52,11 +56,11 @@ public class ReservationServiceImpl implements ReservationService {
                     }
                     return bookReservationRepo.save(new BookReservation(book, ReservationStatus.WAITING, member.get(), LocalDate.now()));
                 }
-                return null; // change to throw statement
+                throw new MaxNumberOfReservationReachedException(Constants.MAX_NUMBER_OF_RESERVATIONS);
             }
-            return null; // throw member does not exist
+            throw new ObjectNotFoundException("Member account", memberId);
         }
-        return null; // throw reservation already exist
+        throw new ReservationAlreadyExistsException(memberId, bookId);
     }
 
     @Override
@@ -82,7 +86,7 @@ public class ReservationServiceImpl implements ReservationService {
 
             }
         }
-        return null; // throw reservation not found
+        throw new ReservationNotFoundException(memberId, bookId);
     }
 
 
