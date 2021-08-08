@@ -49,5 +49,8 @@ public class LibraryController {
         return new ResponseEntity<>(reservationService.cancelReservation(memberId, bookId), HttpStatus.OK);
     }
 
-
+    @PostMapping("/complete-reservation")
+    public ResponseEntity<BookLending> completeBookReservation(@RequestParam Long memberId, @RequestParam Long bookId){
+        return new ResponseEntity<>(reservationService.completeReservation(memberId, bookId), HttpStatus.OK);
+    }
 }

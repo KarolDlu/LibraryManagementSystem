@@ -30,9 +30,9 @@ public class BookReservation {
     @NotNull
     private LocalDate reservationDate;
 
-    public BookReservation(Book book, MemberAccount memberAccount, @NotNull LocalDate reservationDate) {
+    public BookReservation(Book book, ReservationStatus status, MemberAccount memberAccount, @NotNull LocalDate reservationDate) {
         this.book = book;
-        this.reservationStatus = ReservationStatus.WAITING;
+        this.reservationStatus = status;
         this.memberAccount = memberAccount;
         this.reservationDate = reservationDate;
     }

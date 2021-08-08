@@ -1,6 +1,8 @@
 package com.library.librarysystem.DTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
 import com.library.librarysystem.model.Book;
 
 import javax.validation.constraints.NotNull;
@@ -10,8 +12,10 @@ public class BookItemDTO {
 
     @NotNull
     private Book book;
-    @JsonFormat(pattern = "yyyy-mm-dd")
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate dateOfPurchase;
+
     @NotNull
     private Double price;
 

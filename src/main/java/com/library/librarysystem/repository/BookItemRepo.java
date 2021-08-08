@@ -14,7 +14,6 @@ public interface BookItemRepo extends JpaRepository<BookItem, Long> {
 
     List<BookItem> findBookItemsByBook_BookId(Long bookId);
 
-    Optional<BookItem> findBookItemByBookAndBookStatus(Book book, BookStatus status);
+    List<BookItem> findBookItemsByBookAndBookStatus(Book book, BookStatus status);
 
-    Optional<BookItem> findBookItemByBook_BookIdAndBookStatus(Long bookId, BookStatus status);
 }
