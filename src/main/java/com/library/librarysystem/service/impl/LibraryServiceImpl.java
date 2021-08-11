@@ -60,10 +60,8 @@ public class LibraryServiceImpl implements LibraryService {
     @Override
     public boolean returnBook(Long memberId, Long bookItemId) {
         Optional<BookLending> optBookLending = bookLendingRepo.findBookLendingByMemberAccount_IdAndBookItem_Id(memberId, bookItemId);
-        if (optBookLending.isPresent()) {
-            BookLending bookLending = optBookLending.get();
+        return optBookLending.map(bookLending -> {
             BookItem bookItem = bookItemRepo.getById(bookItemId);
-
             bookItem.returnBook();
             List<BookReservation> reservations = bookReservationRepo.findBookReservationsByBookAndReservationStatusOrderByReservationDateAsc(bookLending.getBook(), ReservationStatus.WAITING);
             if (reservations.size() > 0) {
@@ -76,15 +74,13 @@ public class LibraryServiceImpl implements LibraryService {
             bookLendingRepo.delete(bookLending);
 
             return true;
-        }
-        return false;
+        }).orElse(false);
     }
 
     @Override
     public boolean renewBook(Long memberId, Long bookItemId) {
         Optional<BookLending> optBookLending = bookLendingRepo.findBookLendingByMemberAccount_IdAndBookItem_Id(memberId, bookItemId);
-        if (optBookLending.isPresent()) {
-            BookLending bookLending = optBookLending.get();
+        return optBookLending.map(bookLending -> {
             List<BookReservation> reservations = bookReservationRepo.findBookReservationsByBookAndReservationStatusOrderByReservationDateAsc(bookLending.getBook(), ReservationStatus.WAITING);
             if (reservations.size() == 0) {
                 bookLending.renewLending();
@@ -97,8 +93,9 @@ public class LibraryServiceImpl implements LibraryService {
             bookItemRepo.save(reservedBookItem);
             reservation.changeStatus(ReservationStatus.PENDING);
             throw new BookAlreadyReservedException(reservedBookItem.getBook().getBookId());
-        }
-        throw new ObjectNotFoundException("BookLending with memberId: (" + memberId + ") and bookItemId: (" + bookItemId + ") does not exists.");
+        }).orElseThrow(() -> {
+            throw new ObjectNotFoundException("BookLending with memberId: (" + memberId + ") and bookItemId: (" + bookItemId + ") does not exists.");
+        });
     }
 
     private MemberAccount checkIfMemberMayBorrowBook(Long memberId) {
@@ -106,25 +103,25 @@ public class LibraryServiceImpl implements LibraryService {
             throw new MaxNumberOfBorrowedBooksReachedException(memberId, Constants.MAX_BOOKS_BORROWED_BY_USER);
         }
         Optional<MemberAccount> optMember = memberAccountRepo.findById(memberId);
-        if (!optMember.isPresent()) {
+        return optMember.map(member -> {
+            if (member.isBlocked()) {
+                throw new MemberAccountBlockedException(memberId);
+            }
+            return member;
+        }).orElseThrow(() -> {
             throw new ObjectNotFoundException("Member", memberId);
-        }
-        MemberAccount member = optMember.get();
-        if (member.isBlocked()) {
-            throw new MemberAccountBlockedException(memberId);
-        }
-        return member;
+        });
     }
 
     private BookItem checkIfBookItemIsAvailable(Long bookItemId) {
         Optional<BookItem> optBookItem = bookItemRepo.findById(bookItemId);
-        if (!optBookItem.isPresent()) {
+        return optBookItem.map(bookItem -> {
+            if (!bookItem.getBookStatus().equals(BookStatus.AVAILABLE)) {
+                throw new BookNotAvailableException(bookItemId);
+            }
+            return bookItem;
+        }).orElseThrow(() -> {
             throw new ObjectNotFoundException("A copy of book", bookItemId);
-        }
-        BookItem bookItem = optBookItem.get();
-        if (!bookItem.getBookStatus().equals(BookStatus.AVAILABLE)) {
-            throw new BookNotAvailableException(bookItemId);
-        }
-        return bookItem;
+        });
     }
 }

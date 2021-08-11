@@ -94,8 +94,7 @@ public class ReservationServiceImpl implements ReservationService {
     public boolean cancelReservation(Long memberId, Long bookId) {
 
         Optional<BookReservation> optReservation = bookReservationRepo.findBookReservationByMemberAccount_IdAndBook_BookIdAndReservationStatusNotIn(memberId, bookId, Arrays.asList(new ReservationStatus[]{ReservationStatus.CANCELED, ReservationStatus.COMPLETED}));
-        if (optReservation.isPresent()) {
-            BookReservation reservation = optReservation.get();
+        return optReservation.map(reservation -> {
             if (reservation.getReservationStatus().equals(ReservationStatus.WAITING)) {
                 reservation.changeStatus(ReservationStatus.CANCELED);
                 bookReservationRepo.save(reservation);
@@ -118,16 +117,13 @@ public class ReservationServiceImpl implements ReservationService {
                     }
                 }
             }
-        }
-        return false;
+            return false;
+        }).orElse(false);
     }
 
     @Override
     public boolean checkIfBookIsReservedByMember(Long memberId, Long bookId) {
         Optional<BookReservation> optReservation = bookReservationRepo.findBookReservationByMemberAccount_IdAndBook_BookIdAndReservationStatus(memberId, bookId, ReservationStatus.PENDING);
-        if (optReservation.isPresent()) {
-            return true;
-        }
-        return false;
+        return optReservation.isPresent();
     }
 }

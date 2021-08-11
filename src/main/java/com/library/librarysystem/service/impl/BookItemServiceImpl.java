@@ -28,12 +28,11 @@ public class BookItemServiceImpl implements BookItemService {
 
     @Override
     public BookItem addBookItem(BookItemDTO newBookItem) {
-        Optional<Book> book = bookRepo.findById(newBookItem.getBook().getBookId());
-        if (book.isPresent()) {
-            BookItem bookItem = new BookItem(book.get(), BookStatus.AVAILABLE, newBookItem.getDateOfPurchase(), newBookItem.getPrice());
-            return bookItemRepo.save(bookItem);
-        }
-        throw new ObjectNotFoundException("Book", newBookItem.getBook().getBookId());
+        Optional<Book> optBook = bookRepo.findById(newBookItem.getBook().getBookId());
+        return optBook.map(book -> bookItemRepo.save(new BookItem(book, BookStatus.AVAILABLE, newBookItem.getDateOfPurchase(), newBookItem.getPrice()))).orElseThrow(() -> {
+            throw new ObjectNotFoundException("Book", newBookItem.getBook().getBookId());
+        });
+
     }
 
     @Override
@@ -48,19 +47,14 @@ public class BookItemServiceImpl implements BookItemService {
 
     @Override
     public BookItem getBookItemById(Long bookItemId) {
-        Optional<BookItem> bookItem = bookItemRepo.findById(bookItemId);
-        if (bookItem.isPresent()) {
-            return bookItem.get();
-        }
-        throw new ObjectNotFoundException("BookItem", bookItemId);
+        Optional<BookItem> optBookItem = bookItemRepo.findById(bookItemId);
+        return optBookItem.orElseThrow(() -> new ObjectNotFoundException("BookItem", bookItemId));
     }
 
     @Override
     public void deleteBookItem(Long bookItemId) {
-        if (bookItemRepo.findById(bookItemId).isPresent()) {
-            bookItemRepo.deleteById(bookItemId);
-        } else {
+        bookItemRepo.findById(bookItemId).ifPresentOrElse(bookItem -> bookItemRepo.delete(bookItem), () -> {
             throw new ObjectNotFoundException("BookItem", bookItemId);
-        }
+        });
     }
 }

@@ -30,10 +30,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Book addBook(Book newBook) {
-        if (!bookRepo.findByIsbn(newBook.getIsbn()).isPresent()) {
-            return bookRepo.save(newBook);
-        }
-        throw new BookAlreadyExists(newBook.getIsbn());
+        return (Book) bookRepo.findByIsbn(newBook.getIsbn()).map(book -> {
+            throw new BookAlreadyExists(newBook.getIsbn());
+        }).orElse(bookRepo.save(newBook));
     }
 
     @Override
@@ -48,11 +47,10 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> getBooksByAuthor(Long id) {
-        Optional<Author> author = authorRepo.findById(id);
-        if (author.isPresent()) {
-            return bookRepo.findBookByAuthorsContains(author.get());
-        }
-        throw new ObjectNotFoundException("Author", id);
+        Optional<Author> optAuthor = authorRepo.findById(id);
+        return optAuthor.map(author -> bookRepo.findBookByAuthorsContains(author)).orElseThrow(() -> {
+            throw new ObjectNotFoundException("Author", id);
+        });
     }
 
     @Override
@@ -63,19 +61,17 @@ public class BookServiceImpl implements BookService {
     @Override
     public Book getBookById(Long id) {
         Optional<Book> book = bookRepo.findById(id);
-        if (book.isPresent()) {
-            return book.get();
-        }
-        throw new ObjectNotFoundException("Book", id); // add throw statement
+        return book.orElseThrow(() -> {
+            throw new ObjectNotFoundException("Book", id);
+        });
     }
 
     @Override
     public Book getBookByIsbn(String isbn) {
         Optional<Book> book = bookRepo.findByIsbn(isbn);
-        if (book.isPresent()) {
-            return book.get();
-        }
-        throw new ObjectNotFoundException("Book", "isbn", isbn); // add throw statement
+        return book.orElseThrow(() -> {
+            throw new ObjectNotFoundException("Book", "isbn", isbn);
+        });
     }
 
     @Override
@@ -85,17 +81,16 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Author addAuthor(Author author) {
-        if (authorRepo.findAuthorByName(author.getName()).isPresent()) {
-            return authorRepo.save(author);
-        }
-        throw new ObjectAlreadyExistsException("Author with given name: " + author.getName() + " already exists.");
+        return (Author) authorRepo.findAuthorByName(author.getName()).map(author1 -> {
+            throw new ObjectAlreadyExistsException("Author with given name: " + author.getName() + " already exists.");
+        }).orElse(authorRepo.save(author));
+
     }
 
     @Override
     public void deleteAuthor(Long authorId) {
-        if (authorRepo.findById(authorId).isPresent()) {
-            authorRepo.deleteById(authorId);
-        }
-        throw new ObjectNotFoundException("Author", authorId);
+        authorRepo.findById(authorId).ifPresentOrElse(author -> authorRepo.delete(author), () -> {
+            throw new ObjectNotFoundException("Author", authorId);
+        });
     }
 }
